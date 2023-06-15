@@ -3,8 +3,8 @@
 /*-----------------    2023-2   ---------------------------*/
 /*------ Cruz Cedillo Daniel Alejandro		  -------------*/
 /*------------- No. Cuenta: 316083298---------------*/
-/*------ Rueda Aguilar Karla Vanessa		  -------------*/
-/*------------- No. Cuenta: 315184945---------------*/
+/*------ Chávez Flores Giovanni		  -------------*/
+/*------------- No. Cuenta: 317053319---------------*/
 #include <Windows.h>
 #include <Windows.h>
 
@@ -47,7 +47,7 @@ GLFWmonitor *monitors;
 void getResolution(void);
 
 // camera
-Camera camera(glm::vec3(0.0f, 15.0f, 350.0f));//Posicion incial de la camara 
+Camera camera(glm::vec3(0.0f, 15.0f, 0.0f));//Posicion incial de la camara (0,15,350)
 float MovementSpeed = 50.0f;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -62,8 +62,18 @@ double	deltaTime = 0.0f,
 //Lighting
 glm::vec3 lightPosition(0.0f, 4.0f, -10.0f);
 glm::vec3 lightDirection(0.0f, -1.0f, -1.0f); //Direccion de la fuente de luz
+glm::vec3 direccionluz(0.0f, -1.0f, 0.0f);
 glm::vec3 myposition02(80.0f, 4.0f, 0.0f);
-glm::vec3 myColor01(0.0f, 0.0f, 1.0f);
+glm::vec3 myColor01(0.0f, 0.0f, 0.0f);
+
+//Luz escenario
+float luzdif = 0.55f,
+luzspec = 0.2f;
+
+//luz arcade
+float luzarcspec = 0.5f,
+luzarcdif = 1.0f;
+bool encendidoarcade = true;
 
 //-------------------------------------------------------------------------------------
 // Daclaracion de variables que se usaran para las animaciones
@@ -114,6 +124,22 @@ float rotcheff=0.0f,
 	tempcarne = 0.0f,
 	carneinc =1.5f;
 int animcheff = 0;
+
+//BALLON BOY
+glm::vec3 prueba(0.0f, 0.0f, 0.0f);
+float	posX = 0.0f,
+posY = 0.0f,
+posZ = 0.0f,
+rotRodIzq = 0.0f,
+rotRodDer = 0.0f,
+movPierDer = 0.0f,
+movPierIzq = 0.0f,
+giroMonito = 0.0f,
+movBrazoDer = 0.0f, //necesito agregar variable de dibujo, este es el principio del proceso
+movBrazIzq = 0.0f,
+movCabeza = 0.0f,
+movHombroIzq = 0.0f,
+movHombroDer = 0.0f;
 
 //Bunny
 float	rot_bIzqB = 0.0f,
@@ -206,17 +232,35 @@ void animate(void)
 			luzx -= 0.0005f;
 			luzy -= 0.0005;
 			luzz -= 0.0005;
-			if (luzx <= 0.1f)
+			if (luzx <= 0.05f) {
+				luzdif = 0.0;
+				luzspec = 0.0;
 				dia = 2;
+				printf("noche ");
+			}
+				
 			break;
 		case 2:
 			noche += 0.001;
 			if (noche >= 1.0f) {
 				dia = 0;
 				noche = 0.0f;
+				luzdif = 0.55;
+				luzspec = 0.2;
+				printf("dia ");
 			}
 		
 	}
+	//Luz arcade
+	if (encendidoarcade) {
+		luzarcspec = 0.5f;
+		luzarcdif = 1.0f;
+	}
+	else {
+		luzarcspec = 0.0f;
+		luzarcdif = 0.0f;
+	}
+	
 	//--------------------------------------------------------------------------------
 	//Animacion por keyframes
 	if (play)
@@ -580,12 +624,8 @@ int main()
 	//--------------------------------------------------------------------------------
 	Model restaurante("resources/objects/restaurante/rest.obj");
 	Model mesa("resources/objects/mesa/mesa.obj");
-	Model silla("resources/objects/silla/silla.obj");
 	Model pastel("resources/objects/pastel/pastel.obj");
 	Model micro("resources/objects/microfono/micro.obj");
-	Model globor("resources/objects/globos/globor.obj");
-	Model globop("resources/objects/globos/globop.obj");
-	Model globon("resources/objects/globos/globon.obj");
 	Model globodec("resources/objects/globos/globodec.obj");
 	Model cocina("resources/objects/cocina/cocina.obj");
 	Model bar("resources/objects/bar/bar.obj");
@@ -593,6 +633,7 @@ int main()
 	Model Arcade1("resources/objects/arcade/a1.obj");
 	Model Arcade2("resources/objects/arcade/a2.obj");
 	Model Arcade3("resources/objects/arcade/a3.obj");
+	Model luzTecho("resources/objects/luz/luztecho.obj");
 	//--------------------------------------------------------------------------------
 	//Modelos con animacion
 	//--------------------------------------------------------------------------------
@@ -625,244 +666,25 @@ int main()
 	Model BunnyPieIzq("resources/objects/Bunny/pIzqBunny.obj");
 	Model BunnyPieDer("resources/objects/Bunny/pDerBunny.obj");
 	//Globo
-	Model globo("resources/objects/globos/globodec.obj");
+
+	//Ballon boy
+	Model torsoBB("resources/objects/BallonBoy/torso.obj");
+	Model cabezaBB("resources/objects/BallonBoy/cabeza.obj");
+	Model molinoBB("resources/objects/BallonBoy/molino.obj");
+	Model hombroDerBB("resources/objects/BallonBoy/hombroDer.obj");
+	Model hombroIzqBB("resources/objects/BallonBoy/hombroIzq.obj");
+	Model brazoDerBB("resources/objects/BallonBoy/brazoDer.obj");
+	Model brazoIzqBB("resources/objects/BallonBoy/brazoIzq.obj");
+	Model piernaDerArrBB("resources/objects/BallonBoy/piernaDerArr.obj");
+	Model piernaDerAbBB("resources/objects/BallonBoy/piernaDerAb.obj");
+	Model piernaIzqArrBB("resources/objects/BallonBoy/piernaIzqArr.obj");
+	Model piernaIzqAbBB("resources/objects/BallonBoy/piernaDerAb.obj");
+	Model globoBB("resources/objects/BallonBoy/globo.obj");
+	Model letreroBB("resources/objects/BallonBoy/letrero.obj");
 
 	//para keyframes
 	animate();
 	//Inicialización de KeyFrames
-
-	KeyFrame[0].movGlobo_x = 0.0f;
-	KeyFrame[0].movGlobo_y = 0.0f;
-	KeyFrame[0].movGlobo_z = 0.0f;
-	KeyFrame[0].giroGlobo = 0;
-
-
-	KeyFrame[1].movGlobo_x = 0.0f;
-	KeyFrame[1].movGlobo_y = 10.0f;
-	KeyFrame[1].movGlobo_z = 0.0f;
-	KeyFrame[1].giroGlobo = 0;
-
-
-	KeyFrame[2].movGlobo_x = 5.0f;
-	KeyFrame[2].movGlobo_y = 6.0f;
-	KeyFrame[2].movGlobo_z = 0.0f;
-	KeyFrame[2].giroGlobo = 0;
-
-
-	KeyFrame[3].movGlobo_x = 7.0f;
-	KeyFrame[3].movGlobo_y = 10.0f;
-	KeyFrame[3].movGlobo_z = 0.0f;
-	KeyFrame[3].giroGlobo = 0;
-
-	KeyFrame[4].movGlobo_x = 9.0f;
-	KeyFrame[4].movGlobo_y = 6.0f;
-	KeyFrame[4].movGlobo_z = 0.0f;
-	KeyFrame[4].giroGlobo = 0.0f;
-
-	KeyFrame[5].movGlobo_x = 11.0f;
-	KeyFrame[5].movGlobo_y = 10.0f;
-	KeyFrame[5].movGlobo_z = 0.0f;
-	KeyFrame[5].giroGlobo = 0;
-
-	KeyFrame[6].movGlobo_x = 13.0f;
-	KeyFrame[6].movGlobo_y = 6.0f;
-	KeyFrame[6].movGlobo_z = 0.0f;
-	KeyFrame[6].giroGlobo = 0;
-
-	KeyFrame[7].movGlobo_x = 15.0f;
-	KeyFrame[7].movGlobo_y = 10.0f;
-	KeyFrame[7].movGlobo_z = 0.0f;
-	KeyFrame[7].giroGlobo = 0;
-
-	KeyFrame[8].movGlobo_x = 17.0f;
-	KeyFrame[8].movGlobo_y = 6.0f;
-	KeyFrame[8].movGlobo_z = 0.0f;
-	KeyFrame[8].giroGlobo = 90;
-
-	KeyFrame[9].movGlobo_x = 19.0f;
-	KeyFrame[9].movGlobo_y = 10.0f;
-	KeyFrame[9].movGlobo_z = -4.0f;
-	KeyFrame[9].giroGlobo = 90;
-
-	KeyFrame[10].movGlobo_x = 19.0f;
-	KeyFrame[10].movGlobo_y = 6.0f;
-	KeyFrame[10].movGlobo_z = -8.0f;
-	KeyFrame[10].giroGlobo = 90;
-
-	KeyFrame[11].movGlobo_x = 19.0f;
-	KeyFrame[11].movGlobo_y = 10.0f;
-	KeyFrame[11].movGlobo_z = -12.0f;
-	KeyFrame[11].giroGlobo = 90;
-
-	KeyFrame[12].movGlobo_x = 19.0f;
-	KeyFrame[12].movGlobo_y = 6.0f;
-	KeyFrame[12].movGlobo_z = -16.0f;
-	KeyFrame[12].giroGlobo = 90;
-
-	KeyFrame[13].movGlobo_x = 19.0f;
-	KeyFrame[13].movGlobo_y = 10.0f;
-	KeyFrame[13].movGlobo_z = -20.0f;
-	KeyFrame[13].giroGlobo = 90;
-
-	KeyFrame[14].movGlobo_x = 19.0f;
-	KeyFrame[14].movGlobo_y = 6.0f;
-	KeyFrame[14].movGlobo_z = -24.0f;
-	KeyFrame[14].giroGlobo = 90;
-
-	KeyFrame[15].movGlobo_x = 19.0f;
-	KeyFrame[15].movGlobo_y = 10.0f;
-	KeyFrame[15].movGlobo_z = -28.0f;
-	KeyFrame[15].giroGlobo = 90;
-
-	KeyFrame[16].movGlobo_x = 19.0f;
-	KeyFrame[16].movGlobo_y = 6.0f;
-	KeyFrame[16].movGlobo_z = -32.0f;
-	KeyFrame[16].giroGlobo = 90;
-
-	KeyFrame[17].movGlobo_x = 19.0f;
-	KeyFrame[17].movGlobo_y = 10.0f;
-	KeyFrame[17].movGlobo_z = -36.0f;
-	KeyFrame[17].giroGlobo = 90;
-
-	KeyFrame[18].movGlobo_x = 19.0f;
-	KeyFrame[18].movGlobo_y = 6.0f;
-	KeyFrame[18].movGlobo_z = -40.0f;
-	KeyFrame[18].giroGlobo = 90;
-
-	KeyFrame[19].movGlobo_x = 19.0f;
-	KeyFrame[19].movGlobo_y = 5.0f;
-	KeyFrame[19].movGlobo_z = -44.0f;
-	KeyFrame[19].giroGlobo = 90;
-
-	KeyFrame[20].movGlobo_x = 19.0f;
-	KeyFrame[20].movGlobo_y = 4.0f;
-	KeyFrame[20].movGlobo_z = -48.0f;
-	KeyFrame[20].giroGlobo = 90;
-
-	KeyFrame[21].movGlobo_x = 19.0f;
-	KeyFrame[21].movGlobo_y = 3.0f;
-	KeyFrame[21].movGlobo_z = -52.0f;
-	KeyFrame[21].giroGlobo = 90;
-
-	KeyFrame[22].movGlobo_x = 19.0f;
-	KeyFrame[22].movGlobo_y = 2.0f;
-	KeyFrame[22].movGlobo_z = -56.0f;
-	KeyFrame[22].giroGlobo = 90;
-
-	KeyFrame[23].movGlobo_x = 19.0f;
-	KeyFrame[23].movGlobo_y = 1.0f;
-	KeyFrame[23].movGlobo_z = -60.0f;
-	KeyFrame[23].giroGlobo = 90;
-
-	KeyFrame[24].movGlobo_x = 19.0f;
-	KeyFrame[24].movGlobo_y = 0.0f;
-	KeyFrame[24].movGlobo_z = -64.0f;
-	KeyFrame[24].giroGlobo = 90;
-
-	KeyFrame[25].movGlobo_x = 19.0f;
-	KeyFrame[25].movGlobo_y = 0.0f;
-	KeyFrame[25].movGlobo_z = -68.0f;
-	KeyFrame[25].giroGlobo = 90;
-	
-	KeyFrame[26].movGlobo_x = 19.0f;
-	KeyFrame[26].movGlobo_y = 0.0f;
-	KeyFrame[26].movGlobo_z = -68.0f;
-	KeyFrame[26].giroGlobo = 180;
-	
-	KeyFrame[27].movGlobo_x = 15.0f;
-	KeyFrame[27].movGlobo_y = 1.0f;
-	KeyFrame[27].movGlobo_z = -68.0f;
-	KeyFrame[27].giroGlobo = 180;
-
-	KeyFrame[28].movGlobo_x = 11.0f;
-	KeyFrame[28].movGlobo_y = 2.f;
-	KeyFrame[28].movGlobo_z = -68.0f;
-	KeyFrame[28].giroGlobo = 180;
-
-	KeyFrame[29].movGlobo_x = 7.0f;
-	KeyFrame[29].movGlobo_y = 3.0f;
-	KeyFrame[29].movGlobo_z = -68.0f;
-	KeyFrame[29].giroGlobo = 180;
-
-	KeyFrame[30].movGlobo_x = 3.0f;
-	KeyFrame[30].movGlobo_y = 4.0f;
-	KeyFrame[30].movGlobo_z = -68.0f;
-	KeyFrame[30].giroGlobo = 180;
-
-	KeyFrame[31].movGlobo_x = -1.0f;
-	KeyFrame[31].movGlobo_y = 5.0f;
-	KeyFrame[31].movGlobo_z = -68.0f;
-	KeyFrame[31].giroGlobo = 180;
-
-	KeyFrame[32].movGlobo_x = -5.0f;
-	KeyFrame[32].movGlobo_y = 6.0f;
-	KeyFrame[32].movGlobo_z = -68.0f;
-	KeyFrame[32].giroGlobo = 180;
-	
-	KeyFrame[33].movGlobo_x = -5.0f;
-	KeyFrame[33].movGlobo_y = 6.0f;
-	KeyFrame[33].movGlobo_z = -68.0f;
-	KeyFrame[33].giroGlobo = 270;
-	
-	KeyFrame[34].movGlobo_x = -5.0f;
-	KeyFrame[34].movGlobo_y = 10.0f;
-	KeyFrame[34].movGlobo_z = -60.0f;
-	KeyFrame[34].giroGlobo = 270;
-
-	KeyFrame[35].movGlobo_x = -5.0f;
-	KeyFrame[35].movGlobo_y = 6.0f;
-	KeyFrame[35].movGlobo_z = -52.0f;
-	KeyFrame[35].giroGlobo = 270;
-
-	KeyFrame[36].movGlobo_x = -5.0f;
-	KeyFrame[36].movGlobo_y = 10.0f;
-	KeyFrame[36].movGlobo_z = -44.0f;
-	KeyFrame[36].giroGlobo = 270;
-
-	KeyFrame[37].movGlobo_x = -5.0f;
-	KeyFrame[37].movGlobo_y = 6.0f;
-	KeyFrame[37].movGlobo_z = -36.0f;
-	KeyFrame[37].giroGlobo = 270;
-
-	KeyFrame[38].movGlobo_x = -5.0f;
-	KeyFrame[38].movGlobo_y = 10.0f;
-	KeyFrame[38].movGlobo_z = -28.0f;
-	KeyFrame[38].giroGlobo = 270;
-
-	KeyFrame[39].movGlobo_x = -5.0f;
-	KeyFrame[39].movGlobo_y = 6.0f;
-	KeyFrame[39].movGlobo_z = -20.0f;
-	KeyFrame[39].giroGlobo = 270;
-
-	KeyFrame[40].movGlobo_x = -5.0f;
-	KeyFrame[40].movGlobo_y = 10.0f;
-	KeyFrame[40].movGlobo_z = -12.0f;
-	KeyFrame[40].giroGlobo = 270;
-
-	KeyFrame[41].movGlobo_x = -5.0f;
-	KeyFrame[41].movGlobo_y = 6.0f;
-	KeyFrame[41].movGlobo_z = -4.0f;
-	KeyFrame[41].giroGlobo = 270;
-
-	KeyFrame[42].movGlobo_x = -5.0f;
-	KeyFrame[42].movGlobo_y = 5.0f;
-	KeyFrame[42].movGlobo_z = 0.0f;
-	KeyFrame[42].giroGlobo = 270;
-	
-	KeyFrame[43].movGlobo_x = -5.0f;
-	KeyFrame[43].movGlobo_y = 5.0f;
-	KeyFrame[43].movGlobo_z = 0.0f;
-	KeyFrame[43].giroGlobo = 360;
-	
-	KeyFrame[44].movGlobo_x = -5.0f;
-	KeyFrame[44].movGlobo_y = 0.0f;
-	KeyFrame[44].movGlobo_z = 0.0f;
-	KeyFrame[44].giroGlobo = 360;
-	
-	KeyFrame[45].movGlobo_x = 0.0f;
-	KeyFrame[45].movGlobo_y = 0.0f;
-	KeyFrame[45].movGlobo_z = 0.0f;
-	KeyFrame[45].giroGlobo = 360;
 
 
 	//Inicialización de KeyFrames
@@ -895,35 +717,47 @@ int main()
 		// don't forget to enable shader before setting uniforms
 		staticShader.use();
 		//Setup Advanced Lights
+		//------------------------------------------------------------------------------------------------------------------------
 		staticShader.setVec3("viewPos", camera.Position);
 		staticShader.setVec3("dirLight.direction", lightDirection);
 		staticShader.setVec3("dirLight.ambient", glm::vec3(luzx, luzy, luzz));//Da luz a todo
 		staticShader.setVec3("dirLight.diffuse", glm::vec3(0.0f, 0.0f, 0.0f));	//Da luz desde un únto
 		staticShader.setVec3("dirLight.specular", glm::vec3(0.0f, 0.0f, 0.0f));	//Brillo sobre una superficie
 
-		staticShader.setVec3("pointLight[0].position", lightPosition);
-		staticShader.setVec3("pointLight[0].ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-		staticShader.setVec3("pointLight[0].diffuse", glm::vec3(1.0f, 1.0f, 0.0f));
-		staticShader.setVec3("pointLight[0].specular", glm::vec3(0.0f, 0.0f, 0.0f));
+		//Luz lampara salon
+		staticShader.setVec3("pointLight[0].position", glm::vec3(0.0, 70.0f, -150.0f));
+		staticShader.setVec3("pointLight[0].ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+		staticShader.setVec3("pointLight[0].diffuse", glm::vec3(luzdif, luzdif, 0.0f));
+		staticShader.setVec3("pointLight[0].specular", glm::vec3(luzspec, luzspec, luzspec));
 		staticShader.setFloat("pointLight[0].constant", 0.008f); //Potencia de la luz
-		staticShader.setFloat("pointLight[0].linear", 0.009f); //distancia de luz, control mas fino
-		staticShader.setFloat("pointLight[0].quadratic", 0.032f);//distancia de luz, es mas brusco, a mas pequeño menor atenuacion mas viaja la luz
+		staticShader.setFloat("pointLight[0].linear", 0.00009f); //distancia de luz, control mas fino
+		staticShader.setFloat("pointLight[0].quadratic", 0.00032f);//distancia de luz, es mas brusco, a mas pequeño menor atenuacion mas viaja la luz
 
-		staticShader.setVec3("pointLight[1].position", glm::vec3(-80.0, 0.0f, 0.0f));
-		staticShader.setVec3("pointLight[1].ambient", glm::vec3(0.0f, 0.2f, 0.0f));
-		staticShader.setVec3("pointLight[1].diffuse", myColor01);
-		staticShader.setVec3("pointLight[1].specular", glm::vec3(0.0f, 0.0f, 0.0f));
-		staticShader.setFloat("pointLight[1].constant", 1.0f);
-		staticShader.setFloat("pointLight[1].linear", 0.009f);
-		staticShader.setFloat("pointLight[1].quadratic", 0.00000032f);
+		staticShader.setVec3("pointLight[1].position", glm::vec3(0.0, 70.0f, -50.0f));
+		staticShader.setVec3("pointLight[1].ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+		staticShader.setVec3("pointLight[1].diffuse", glm::vec3(luzdif, luzdif, 0.0f));
+		staticShader.setVec3("pointLight[1].specular", glm::vec3(luzspec, luzspec, luzspec));
+		staticShader.setFloat("pointLight[1].constant", 0.008f);
+		staticShader.setFloat("pointLight[1].linear", 0.00009f);
+		staticShader.setFloat("pointLight[1].quadratic", 0.00032f);
 
-		staticShader.setVec3("pointLight[2].position", myposition02);
-		staticShader.setVec3("pointLight[2].ambient", glm::vec3(0.0f, 0.2f, 0.0f));
-		staticShader.setVec3("pointLight[2].diffuse", glm::vec3(0.0f, 0.0f, 1.0f));
-		staticShader.setVec3("pointLight[2].specular", glm::vec3(0.0f, 0.0f, 0.0f));
-		staticShader.setFloat("pointLight[2].constant", 1.0f);
-		staticShader.setFloat("pointLight[2].linear", 0.009f);
-		staticShader.setFloat("pointLight[2].quadratic", 0.0000032f);
+		//Luz cocina
+		staticShader.setVec3("pointLight[2].position", glm::vec3(-200.0, 70.0f, -50.0f));
+		staticShader.setVec3("pointLight[2].ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+		staticShader.setVec3("pointLight[2].diffuse", glm::vec3(luzdif, luzdif, 0.0f));
+		staticShader.setVec3("pointLight[2].specular", glm::vec3(luzspec, luzspec, luzspec));
+		staticShader.setFloat("pointLight[2].constant", 0.008f);
+		staticShader.setFloat("pointLight[2].linear", 0.00009f);
+		staticShader.setFloat("pointLight[2].quadratic", 0.00032f);
+
+		//Luz arcade
+		staticShader.setVec3("pointLight[3].position", glm::vec3(170, 20.0f, 10.0f));
+		staticShader.setVec3("pointLight[3].ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+		staticShader.setVec3("pointLight[3].diffuse", glm::vec3(luzarcdif, 0.0f, 0.0f));
+		staticShader.setVec3("pointLight[3].specular", glm::vec3(luzarcspec, 0.0f, 0.0f));
+		staticShader.setFloat("pointLight[3].constant", 0.008f);
+		staticShader.setFloat("pointLight[3].linear", 0.1f);
+		staticShader.setFloat("pointLight[3].quadratic", 0.0032f);
 
 		//fuente de luz reflector
 		staticShader.setVec3("spotLight[0].position", glm::vec3(camera.Position.x, camera.Position.y, camera.Position.z));//Posicion	
@@ -960,15 +794,6 @@ int main()
 		animShader.use();
 		animShader.setMat4("projection", projection);
 		animShader.setMat4("view", view);
-
-		//animShader.setVec3("material.specular", glm::vec3(0.5f));
-		//animShader.setFloat("material.shininess", 32.0f);
-		//animShader.setVec3("light.ambient", ambientColor);
-		//animShader.setVec3("light.diffuse", diffuseColor);
-		//animShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		//animShader.setVec3("light.direction", lightDirection);
-		//animShader.setVec3("viewPos", camera.Position);
-
 
 		// -------------------------------------------------------------------------------------------------------------------------
 		// Escenario
@@ -1020,26 +845,6 @@ int main()
 		staticShader.setMat4("model", model);
 		pastel.Draw(staticShader);
 
-		//Sillas
-		// -------------------------------------------------------------------------------------------------------------------------
-		/*model = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(30.0));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		staticShader.setMat4("model", model);
-		silla.Draw(staticShader);
-
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 0.0f, 10.0f));
-		model = glm::scale(model, glm::vec3(30.0));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		staticShader.setMat4("model", model);
-		silla.Draw(staticShader);
-
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 0.0f, -10.0f));
-		model = glm::scale(model, glm::vec3(30.0));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		staticShader.setMat4("model", model);
-		silla.Draw(staticShader);*/
-
 		//Sonic
 		// -------------------------------------------------------------------------------------------------------------------------
 		model = glm::translate(glm::mat4(1.0f), glm::vec3(300.0f, 5.0f, 150.0f));
@@ -1048,8 +853,7 @@ int main()
 		staticShader.setMat4("model", model);
 		mapa.Draw(staticShader);
 
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(posxs + 340.0f, poszs + 11.0f, posys)); //(340,10,0)
-		model = glm::scale(model, glm::vec3(3.0));
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(posxs + 340.0f, poszs + 11.0f, posys)); 
 		model = glm::rotate(model, glm::radians(rotsonic), glm::vec3(1.0f, 0.0f, 0.0f));
 		staticShader.setMat4("model", model);
 		sonic.Draw(staticShader);
@@ -1099,32 +903,6 @@ int main()
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
 		micro.Draw(staticShader);
-
-		//Globos
-		// -------------------------------------------------------------------------------------------------------------------------
-		/*model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 25.0f, 40.0f));
-		model = glm::scale(model, glm::vec3(0.25));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		staticShader.setMat4("model", model);
-		globodec.Draw(staticShader);
-
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(15.0f, 25.0f, 40.0f));
-		model = glm::scale(model, glm::vec3(0.25));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		staticShader.setMat4("model", model);
-		globor.Draw(staticShader);
-
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(30.0f, 25.0f, 40.0f));
-		model = glm::scale(model, glm::vec3(0.25));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		staticShader.setMat4("model", model);
-		globon.Draw(staticShader);
-
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(-15.0f, 25.0f, 40.0f));
-		model = glm::scale(model, glm::vec3(0.25));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		staticShader.setMat4("model", model);
-		globop.Draw(staticShader);*/
 
 		//Cocina
 		// -------------------------------------------------------------------------------------------------------------------------
@@ -1313,15 +1091,118 @@ int main()
 		model = glm::rotate(model, glm::radians(rot_pDerB), glm::vec3(1.0f, 0.0f, 0.0f));
 		staticShader.setMat4("model", model);
 		BunnyPieDer.Draw(staticShader);
+		
+		//Ballon boy
+		glm::mat4 pgbb = glm::mat4(1.0f); // BALLONBOY PIVOTE-GLOBO
+		glm::mat4 plbb = glm::mat4(1.0f); // BALLONBOY PIVOTE-LETRERO
+		glm::mat4 torsoTemp = glm::mat4(1.0f);
+		glm::mat4 phdbb = glm::mat4(1.0f); //BALLONBOY PIVOTE-HOMBRO-DERECHO
+		glm::mat4 phibb = glm::mat4(1.0f); // BALLONBOY PIVOTE-HOMBRO-IZQUIERDO
+		glm::mat4 pribb = glm::mat4(1.0f); // BALLONBOY PIVOTE-RODILLA-IZQUIERDA
+		glm::mat4 prdbb = glm::mat4(1.0f); // BALLONBOY PIVOTE-RODILLA-DERECHA
 
-		//Globo
-		// -------------------------------------------------------------------------------------------------------------------------
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(posX_globo + movGlobo_x, posy_globo + movGlobo_y, posz_globo));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.3));
-		model = glm::rotate(model, glm::radians(giroGlobo), glm::vec3(0.0f, 1.0f, 0.0f));
+		//TORZO
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 23.0f, 100.0f));
+		model = glm::translate(model, glm::vec3(posX, posY, posZ));
+		torsoTemp = model = glm::rotate(model, glm::radians(giroMonito), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
-		globo.Draw(staticShader);
+		torsoBB.Draw(staticShader);
+		//CABEZA
+		model = glm::translate(torsoTemp, glm::vec3(0.0f, 10.5f, 1.5f)); //-1.8f
+		model = glm::rotate(model, glm::radians(movCabeza), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 10.5f, 1.5f));
+		staticShader.setMat4("model", model);
+		cabezaBB.Draw(staticShader);
+
+		//HOMBRO_DERECHO
+		model = glm::translate(torsoTemp, glm::vec3(3.0f, 4.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(movHombroDer), glm::vec3(0.0f, 0.0f, 1.0f));
+		phdbb = model = glm::translate(model, glm::vec3(3.0f, 0.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		hombroDerBB.Draw(staticShader);
+
+		//BRAZO_DERECHO
+		model = glm::translate(phdbb, glm::vec3(6.0f, 0.0f, 0.0f));
+		plbb = model = glm::rotate(model, glm::radians(movBrazoDer), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		brazoDerBB.Draw(staticShader);
+
+		//HOMBRO_IZQUIERDO
+		model = glm::translate(torsoTemp, glm::vec3(-3.0f, 4.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(-movHombroIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+		phibb = model = glm::translate(model, glm::vec3(-3.0f, 0.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		hombroIzqBB.Draw(staticShader);
+
+		//BRAZO_IZQUIERDO
+		model = glm::translate(phibb, glm::vec3(-5.0f, 0.0f, 0.0f));
+		pgbb = model = glm::rotate(model, glm::radians(-movBrazIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		brazoIzqBB.Draw(staticShader);
+
+		//PIERNA DERECHA ARRIBA
+		model = glm::translate(torsoTemp, glm::vec3(5.0f, -7.0f, 0.0f)); //-1.8f
+		model = glm::rotate(model, glm::radians(movPierDer), glm::vec3(1.0f, 0.0f, 0.0f));
+		prdbb = model = glm::translate(model, glm::vec3(1.0f, 1.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		piernaDerArrBB.Draw(staticShader);
+
+		//PIERNA DERECHA ABAJO 
+		model = glm::translate(prdbb, glm::vec3(0.0f, -10.0f, -0.5f)); //-1.8f
+		model = glm::rotate(model, glm::radians(rotRodDer), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 2.0f, -0.5f));
+		staticShader.setMat4("model", model);
+		piernaDerAbBB.Draw(staticShader);
+
+		//PIERNA IZQUIERDA ARRIBA
+		model = glm::translate(torsoTemp, glm::vec3(-5.0f, -7.0f, 0.0f)); //-1.8f
+		model = glm::rotate(model, glm::radians(movPierIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+		pribb = model = glm::translate(model, glm::vec3(-1.0f, 1.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		piernaIzqArrBB.Draw(staticShader);
+
+		//PIERNA IZQUIERDA ABAJO
+		model = glm::translate(pribb, glm::vec3(0.0f, -10.0f, -0.5f)); //-1.8f
+		model = glm::rotate(model, glm::radians(rotRodIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 2.0f, -0.5f));
+		staticShader.setMat4("model", model);
+		piernaDerAbBB.Draw(staticShader);
+
+		//GLOBO
+		model = glm::translate(pgbb, glm::vec3(-9.55f, 0.0f, -0.5f)); //-1.8f
+		model = glm::rotate(model, glm::radians(-movBrazIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+		//model = glm::translate(model, glm::vec3(0.0f, 2.0f, -0.5f));
+		staticShader.setMat4("model", model);
+		globoBB.Draw(staticShader);
+		//LETRERO
+		model = glm::translate(plbb, glm::vec3(9.55f, 0.0f, -0.5f)); //-1.8f
+		model = glm::rotate(model, glm::radians(movBrazoDer), glm::vec3(0.0f, 0.0f, 1.0f));
+		//model = glm::translate(model, glm::vec3(0.0f, 2.0f, -0.5f));
+		staticShader.setMat4("model", model);
+		letreroBB.Draw(staticShader);
+
+
+		//Luz Techo
+		//--------------------------------------------------------------------------------------------------------------------------
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 70.0f, -150.0f));
+		model = glm::scale(model, glm::vec3(0.7f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		luzTecho.Draw(staticShader);
+
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 70.0f, -50.0f));
+		model = glm::scale(model, glm::vec3(0.7f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		luzTecho.Draw(staticShader);
+
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(-200.0f, 70.0f, -50.0f));
+		model = glm::scale(model, glm::vec3(0.7f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		staticShader.setMat4("model", model);
+		luzTecho.Draw(staticShader);
 
 		//Pasto Diorama
 		// -------------------------------------------------------------------------------------------------------------------------
@@ -1376,6 +1257,10 @@ void my_input(GLFWwindow *window, int key, int scancode, int action, int mode)
 		camera.ProcessKeyboard(LEFT, (float)deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, (float)deltaTime);
+
+
+
+
 	
 
 	//To play KeyFrame animation 
@@ -1403,12 +1288,16 @@ void my_input(GLFWwindow *window, int key, int scancode, int action, int mode)
 		}
 	}
 
-	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+	//Activcar animaciones 
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS) //Activar o desactivar anmacion Freddy
 		Freddyanim ^= true;
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS) //Activar o desactivar animacion Chica
 		Chicaanim ^= true;
 	/*if (key == GLFW_KEY_3 && action == GLFW_PRESS)
 		animacion ^= true;*/
+	//Activar o desactivar luces
+	if (key == GLFW_KEY_9 && action == GLFW_PRESS)
+		encendidoarcade ^= true;
 
 
 	if (key == GLFW_KEY_0 && action == GLFW_PRESS)
