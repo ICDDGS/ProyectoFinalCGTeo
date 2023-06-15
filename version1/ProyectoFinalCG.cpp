@@ -3,8 +3,8 @@
 /*-----------------    2023-2   ---------------------------*/
 /*------ Cruz Cedillo Daniel Alejandro		  -------------*/
 /*------------- No. Cuenta: 316083298---------------*/
-/*------ Rueda Aguilar Karla Vanessa		  -------------*/
-/*------------- No. Cuenta: 315184945---------------*/
+/*------ Chávez Flores Giovanni		  -------------*/
+/*------------- No. Cuenta: 317053319---------------*/
 #include <Windows.h>
 #include <Windows.h>
 
