@@ -1,0 +1,14 @@
+newmtl acmat_0
+Kd 0.976471 0.580392 0.52549
+Ka 0.976471 0.580392 0.52549
+Ks 1 1 1
+Ns 12.8
+Tr 0
+map_Kd BalloonBoy_Eyes.png
+newmtl acmat_1
+Kd 0.572549 0.513726 0.611765
+Ka 0.572549 0.513726 0.611765
+Ks 1 1 1
+Ns 12.8
+Tr 0
+map_Kd BalloonBoy.png
