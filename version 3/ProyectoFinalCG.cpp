@@ -865,7 +865,8 @@ int main()
 		staticShader.setMat4("model", model);
 		mapa.Draw(staticShader);
 
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(posxs + 340.0f, poszs + 11.0f, posys)); 
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(posxs + 340.0f, poszs + 11.0f, posys));
+		model = glm::scale(model, glm::vec3(3.0));
 		model = glm::rotate(model, glm::radians(rotsonic), glm::vec3(1.0f, 0.0f, 0.0f));
 		staticShader.setMat4("model", model);
 		sonic.Draw(staticShader);
