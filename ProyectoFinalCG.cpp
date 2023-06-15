@@ -90,10 +90,6 @@ rotsonic =0.0f,
 incsonic = 0.0f;
 int animsonic = 0;
 
-
-//Rings
-float rotring = 0.0f;
-
 //Freddy
 float rotBrazoF = 0.0f;
 int animFreddy = 0;
@@ -152,62 +148,54 @@ guardoFrame, reinicioFrame, ciclo, ciclo2, contador = 0;
 //PARA INPUT CON KEYFRAMES 
 void inputKeyframes(bool* keys);
 
-// Keyframes
-float posX_globo = 0.0, posy_globo = 20.0, posz_globo = -100;
-float	movGlobo_x = 0.0f, movGlobo_y = 0.0f, movGlobo_z = 0.0f;
-float giroGlobo = 0;
 
+//--------------------------------------------------------------------------------------------
+//Rings Keyframes
+float rotring = 0.0f;
+float poszring = 0.0f;
+//Calculo incremento
+float incrotring = 0.0f, 
+incposz = 0.0f;
+
+int i = 0, pos =0;
 #define MAX_FRAMES 50
-int i_max_steps = 270;
-int i_curr_steps = 9;
+int i_max_steps = 60;
+int i_curr_steps = 0;
 
 typedef struct _frame
 {
 	//Variables para GUARDAR Key Frames
-	float movGlobo_x;		//Variable para PosicionX
-	float movGlobo_y;		//Variable para PosicionY
-	float movGlobo_z;		//Variable para PosicionZ
-	float movGlobo_xInc;		//Variable para IncrementoX
-	float movGlobo_yInc;		//Variable para IncrementoY
-	float movGlobo_zInc;		//Variable para IncrementoZ
-	float giroGlobo;
-	float giroGloboInc;
+	float poszring;
+	float rotring;
+
 }FRAME; //Estructura Frame
 
 FRAME KeyFrame[MAX_FRAMES];
-int FrameIndex = 46;			//introducir datos
+int FrameIndex = 4;			//Cantidad de Frames
 bool play = false;
 int playIndex = 0;
 
 void saveFrame(void)
 {
-	printf("frameindex %d\n", FrameIndex);
-	KeyFrame[FrameIndex].movGlobo_x = movGlobo_x;
-	printf("KeyFrame[FrameIndex].X = Valor; %d\n", KeyFrame[FrameIndex].movGlobo_x);
-	KeyFrame[FrameIndex].movGlobo_y = movGlobo_y;
-	printf("KeyFrame[FrameIndex].Y = Valor; %d\n", KeyFrame[FrameIndex].movGlobo_y);
-	KeyFrame[FrameIndex].movGlobo_z = movGlobo_z;
-	printf("KeyFrame[FrameIndex].Z = Valor; %d\n", KeyFrame[FrameIndex].movGlobo_z);
-	KeyFrame[FrameIndex].giroGlobo = giroGlobo;
-	printf("KeyFrame[FrameIndex].giroGlobo = Valor; %d\n", KeyFrame[FrameIndex].giroGlobo);
+	std::cout << "Frame Index = " << FrameIndex << std::endl;
+	
+	KeyFrame[FrameIndex].poszring = poszring;
+	KeyFrame[FrameIndex].rotring = rotring;
+	
 	FrameIndex++;
 }
 
 //Punto de incio para reproducir
 void resetElements(void)
 {
-	movGlobo_x = KeyFrame[0].movGlobo_x;
-	movGlobo_y = KeyFrame[0].movGlobo_y;
-	movGlobo_y = KeyFrame[0].movGlobo_z;
-	giroGlobo = KeyFrame[0].giroGlobo;
+	rotring = KeyFrame[0].rotring;
+	poszring = KeyFrame[0].poszring;
 }
 
 void interpolation(void)
 {
-	KeyFrame[playIndex].movGlobo_xInc = (KeyFrame[playIndex + 1].movGlobo_x - KeyFrame[playIndex].movGlobo_x) / i_max_steps;
-	KeyFrame[playIndex].movGlobo_yInc = (KeyFrame[playIndex + 1].movGlobo_y - KeyFrame[playIndex].movGlobo_y) / i_max_steps;
-	KeyFrame[playIndex].movGlobo_zInc = (KeyFrame[playIndex + 1].movGlobo_z - KeyFrame[playIndex].movGlobo_z) / i_max_steps;
-	KeyFrame[playIndex].giroGloboInc = (KeyFrame[playIndex + 1].giroGlobo - KeyFrame[playIndex].giroGlobo) / i_max_steps;
+	incrotring= (KeyFrame[playIndex + 1].rotring - KeyFrame[playIndex].rotring) / i_max_steps;
+	incposz = (KeyFrame[playIndex + 1].poszring - KeyFrame[playIndex].poszring) / i_max_steps;
 }
 
 //-----------------------------------------------------------------------
@@ -287,10 +275,8 @@ void animate(void)
 		}
 		else
 		{
-			movGlobo_x += KeyFrame[playIndex].movGlobo_xInc;
-			movGlobo_y += KeyFrame[playIndex].movGlobo_yInc;
-			movGlobo_z += KeyFrame[playIndex].movGlobo_zInc;
-			giroGlobo += KeyFrame[playIndex].giroGloboInc;
+			poszring += incposz;
+			rotring += incrotring;
 			i_curr_steps++;
 		}
 	}
@@ -355,9 +341,9 @@ void animate(void)
 	//--------------------------------------------------------------------------------
 	//Animacion Ring
 	/*Esta animacion se le da giro al ring*/
-	rotring += 2.5;
-	if (rotring >= 180)
-		rotring = 0.0f;
+	//rotring += 2.5;
+	//if (rotring >= 180)
+		//rotring = 0.0f;
 	//--------------------------------------------------------------------------------
 	//Animacion Saludo Freddy
 	/*Se busca darle una animacion de saludo, para ello se le da animacion al brazo realiando 
@@ -687,9 +673,35 @@ int main()
 	//Inicialización de KeyFrames
 
 
-	//Inicialización de KeyFrames
-	for (int i = 0; i < MAX_FRAMES; i++)
-	{
+	////Inicialización de KeyFrames
+	//for (int i = 0; i < MAX_FRAMES; i++)
+	//{
+
+	//}
+	string arch = "ring.txt";
+	ifstream archivo(arch.c_str());
+	string lineas;
+
+
+	while (getline(archivo, lineas)) {
+
+		printf("%i ", i);
+		switch (i) {
+		case 0:
+			KeyFrame[pos].poszring = std::stof(lineas);
+			break;
+		case 1:
+			KeyFrame[pos].rotring = std::stof(lineas);
+			break;
+
+		}
+		if (i < 2) {
+			i++;
+		}
+		if (i == 2) {
+			pos++;
+			i = 0;
+		}
 
 	}
 
@@ -860,37 +872,37 @@ int main()
 
 		//Rings
 		// -------------------------------------------------------------------------------------------------------------------------
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(340.0f, 10.0f, 150.0f));
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(340.0f, 10.0f + poszring, 150.0f));
 		model = glm::scale(model, glm::vec3(4.0));
 		model = glm::rotate(model, glm::radians(rotring), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
 		ring.Draw(staticShader);
 
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(340.0f, 10.0f, 100.0f));
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(340.0f, 10.0f + poszring, 100.0f));
 		model = glm::scale(model, glm::vec3(4.0));
 		model = glm::rotate(model, glm::radians(rotring), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
 		ring.Draw(staticShader);
 
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(340.0f, 10.0f, 50.0f));
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(340.0f, 10.0f + poszring, 50.0f));
 		model = glm::scale(model, glm::vec3(4.0));
 		model = glm::rotate(model, glm::radians(rotring), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
 		ring.Draw(staticShader);
 
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, 10.0f, 150.0f));
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, 10.0f + poszring, 150.0f));
 		model = glm::scale(model, glm::vec3(4.0));
 		model = glm::rotate(model, glm::radians(rotring), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
 		ring.Draw(staticShader);
 
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, 10.0f, 200.0f));
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, 10.0f + poszring, 200.0f));
 		model = glm::scale(model, glm::vec3(4.0));
 		model = glm::rotate(model, glm::radians(rotring), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
 		ring.Draw(staticShader);
 
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, 10.0f, 250.0f));
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(250.0f, 10.0f + poszring, 250.0f));
 		model = glm::scale(model, glm::vec3(4.0));
 		model = glm::rotate(model, glm::radians(rotring), glm::vec3(0.0f, 1.0f, 0.0f));
 		staticShader.setMat4("model", model);
@@ -1258,36 +1270,6 @@ void my_input(GLFWwindow *window, int key, int scancode, int action, int mode)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, (float)deltaTime);
 
-
-
-
-	
-
-	//To play KeyFrame animation 
-	if (key == GLFW_KEY_P && action == GLFW_PRESS)
-	{
-		if (reproduciranimacion < 1)
-		{
-			if (play == false && (FrameIndex > 1))
-			{
-				resetElements();
-				//First Interpolation				
-				interpolation();
-				play = true;
-				playIndex = 0;
-				i_curr_steps = 0;
-				reproduciranimacion++;
-				printf("\n presiona 0 para habilitar reproducir de nuevo la animación'\n");
-				habilitaranimacion = 0;
-
-			}
-			else
-			{
-				play = false;
-			}
-		}
-	}
-
 	//Activcar animaciones 
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS) //Activar o desactivar anmacion Freddy
 		Freddyanim ^= true;
@@ -1295,60 +1277,35 @@ void my_input(GLFWwindow *window, int key, int scancode, int action, int mode)
 		Chicaanim ^= true;
 	/*if (key == GLFW_KEY_3 && action == GLFW_PRESS)
 		animacion ^= true;*/
-	//Activar o desactivar luces
+		//Activar o desactivar luces
 	if (key == GLFW_KEY_9 && action == GLFW_PRESS)
 		encendidoarcade ^= true;
 
 
-	if (key == GLFW_KEY_0 && action == GLFW_PRESS)
+	
+
+	//To play KeyFrame animation 
+	if (key == GLFW_KEY_P && action == GLFW_PRESS)
 	{
-		if (habilitaranimacion < 1)
+		if (play == false && (FrameIndex > 1))
 		{
-			reproduciranimacion = 0;
+			std::cout << "Play animation" << std::endl;
+			resetElements();
+			//First Interpolation				
+			interpolation();
+
+			play = true;
+			playIndex = 0;
+			i_curr_steps = 0;
+		}
+		else
+		{
+			play = false;
+			std::cout << "Not enough Key Frames" << std::endl;
 		}
 	}
 
-	if (key == GLFW_KEY_L && action == GLFW_PRESS)
-	{
-		if (guardoFrame < 1)
-		{
-			saveFrame();
-			printf("movGlobo_x es: %f\n", movGlobo_x);
-			//printf("movGlobo_y es: %f\n", movGlobo_y);
-			printf(" \npresiona P para habilitar guardar otro frame'\n");
-			guardoFrame++;
-			reinicioFrame = 0;
-		}
-	}
-	if (key == GLFW_KEY_3 && action == GLFW_PRESS)
-	{
-		if (reinicioFrame < 1)
-		{
-			guardoFrame = 0;
-		}
-	}
-
-
-	if (key == GLFW_KEY_K && action == GLFW_PRESS)
-	{
-		if (ciclo < 1)
-		{
-			//printf("movGlobo_x es: %f\n", movGlobo_x);
-			movGlobo_x += 1.0f;
-			printf("\n movGlobo_x es: %f\n", movGlobo_x);
-			ciclo++;
-			ciclo2 = 0;
-			printf("\n reinicia con 2\n");
-		}
-
-	}
-	if (key == GLFW_KEY_J && action == GLFW_PRESS)
-	{
-		if (ciclo2 < 1)
-		{
-			ciclo = 0;
-		}
-	}
+	
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
